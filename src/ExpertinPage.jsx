@@ -11,6 +11,8 @@ import {
   Paper,
   Chip,
   MenuItem,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 
 // Sample car problem data with online images
@@ -47,12 +49,12 @@ const carProblems = [
   },
 ];
 
-const ExpertinCard = memo(({ problem, selected, onSelect }) => (
+const ExpertinCard = memo(({ problem, selected, onSelect, isMobile }) => (
   <Card
     onClick={() => onSelect(problem.title)}
     sx={{
-      width: 400,
-      height: 400,
+      width: isMobile ? '100%' : 400,
+      height: isMobile ? 'auto' : 400,
       borderRadius: 3,
       boxShadow: 4,
       border: selected ? '3px solid #0d47a1' : 'none',
@@ -70,12 +72,12 @@ const ExpertinCard = memo(({ problem, selected, onSelect }) => (
       sx={{
         objectFit: 'cover',
         width: '100%',
-        height: '270px',
+        height: isMobile ? 200 : 270,
       }}
     />
     <CardContent sx={{ flexGrow: 1 }}>
       <Typography
-        variant="h6"
+        variant={isMobile ? 'subtitle1' : 'h6'}
         sx={{
           color: '#0d47a1',
           fontWeight: 'bold',
@@ -92,7 +94,7 @@ const ExpertinCard = memo(({ problem, selected, onSelect }) => (
   </Card>
 ));
 
-const RelatedForm = ({ selectedProblem, onSelect }) => {
+const RelatedForm = ({ selectedProblem, onSelect, isMobile }) => {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -110,16 +112,27 @@ const RelatedForm = ({ selectedProblem, onSelect }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
-    // Typically, you would send form data to your backend here
+    // Send form data to backend here
   };
 
   return (
-    <Paper elevation={4} sx={{ p: 4, mt: 6, maxWidth: 500, mx: 'auto' }}>
-      <Typography variant="h5" sx={{ mb: 2, color: '#0d47a1', fontWeight: 'bold' }}>
+    <Paper
+      elevation={4}
+      sx={{
+        p: isMobile ? 2 : 4,
+        mt: 6,
+        maxWidth: 500,
+        mx: 'auto',
+      }}
+    >
+      <Typography
+        variant={isMobile ? 'h6' : 'h5'}
+        sx={{ mb: 2, color: '#0d47a1', fontWeight: 'bold', textAlign: 'center' }}
+      >
         Get Expert Help
       </Typography>
       {submitted ? (
-        <Typography color="success.main" sx={{ mt: 2 }}>
+        <Typography color="success.main" sx={{ mt: 2, textAlign: 'center' }}>
           Thank you! Your request has been submitted.
         </Typography>
       ) : (
@@ -191,29 +204,44 @@ const RelatedForm = ({ selectedProblem, onSelect }) => {
 
 const ExpertinPage = () => {
   const [selectedProblem, setSelectedProblem] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ py: 8, px: 4, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        py: isMobile ? 4 : 8,
+        px: isMobile ? 2 : 4,
+        backgroundColor: '#f5f5f5',
+        minHeight: '100vh',
+      }}
+    >
       <Typography
-        variant="h4"
-        sx={{ textAlign: 'center', mb: 5, color: '#0d47a1', fontWeight: 'bold' }}
+        variant={isMobile ? 'h5' : 'h4'}
+        sx={{
+          textAlign: 'center',
+          mb: isMobile ? 3 : 5,
+          color: '#0d47a1',
+          fontWeight: 'bold',
+        }}
       >
         Expert in Difficult Car Problems
       </Typography>
 
-      <Grid container spacing={4} justifyContent="center">
+      <Grid container spacing={isMobile ? 2 : 4} justifyContent="center">
         {carProblems.map((problem, index) => (
-          <Grid item key={index}>
+          <Grid item key={index} xs={12} sm={6} md="auto">
             <ExpertinCard
               problem={problem}
               selected={selectedProblem === problem.title}
               onSelect={setSelectedProblem}
+              isMobile={isMobile}
             />
           </Grid>
         ))}
       </Grid>
 
-      <RelatedForm selectedProblem={selectedProblem} onSelect={setSelectedProblem} />
+      <RelatedForm selectedProblem={selectedProblem} onSelect={setSelectedProblem} isMobile={isMobile} />
     </Box>
   );
 };
